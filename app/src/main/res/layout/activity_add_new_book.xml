@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".AddNewBook">
+
+
+    <include
+        android:id="@+id/addNewBook_toolbar"
+        layout="@layout/tool_bar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="top"/>
+
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+     <LinearLayout
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         android:orientation="vertical">
+
+           <ImageView
+                android:id="@+id/Add_ImageView"
+                android:layout_width="414dp"
+                android:layout_height="220dp" />
+
+           <TextView
+               android:id="@+id/ShowTheText"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content" />
+
+        </LinearLayout>
+</ScrollView>
+</LinearLayout>
