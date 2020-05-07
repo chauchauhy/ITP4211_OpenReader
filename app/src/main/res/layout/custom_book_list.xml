@@ -4,8 +4,12 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/book_titile"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:textAlignment="gravity"
+        android:textSize="30dp"
+        android:textColor="@color/black"
         android:text="TextView" />
+
 </LinearLayout>

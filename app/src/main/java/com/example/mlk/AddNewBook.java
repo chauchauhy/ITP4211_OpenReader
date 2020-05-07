@@ -31,9 +31,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
@@ -48,6 +51,7 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 import static android.Manifest.*;
@@ -133,7 +137,7 @@ public class AddNewBook extends AppCompatActivity implements Dialog_bk_title.Dia
         }).show();
     }
 
-    private void makeToast(String contextForToast) {
+    public void makeToast(String contextForToast, Context context) {
         if (contextForToast.equals("D")) {
             Log.i("TAG", "LOSS");
         } else {
@@ -215,7 +219,7 @@ public class AddNewBook extends AppCompatActivity implements Dialog_bk_title.Dia
                             // show text in the image
                             updataToolBar();
                         }else{
-                            makeToast("Unable to recognise the text from this image  ");
+                            makeToast("Unable to recognise the text from this image  ", context);
 
                         }
                     }
@@ -223,13 +227,13 @@ public class AddNewBook extends AppCompatActivity implements Dialog_bk_title.Dia
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    makeToast("Unable to recognise the text from this image  ");
+                    makeToast("Unable to recognise the text from this image  ", context);
 
                 }
             });
         } else {
             // if there not any text the app will show up a dialog to note user
-            makeToast("Unable to recognise the text from this image  ");
+            makeToast("Unable to recognise the text from this image  ", context);
         }
     }
     // this function is use for update the Add UI to Save UI
@@ -240,6 +244,7 @@ public class AddNewBook extends AppCompatActivity implements Dialog_bk_title.Dia
             public void onClick(View view) {
                 Dialog_bk_title dialog_bk_title = new Dialog_bk_title();
                 dialog_bk_title.show(getSupportFragmentManager(), "Dialog");
+
             }
         });
     }
@@ -247,5 +252,36 @@ public class AddNewBook extends AppCompatActivity implements Dialog_bk_title.Dia
     @Override
     public void getTextFromDialog(String title) {
             book.setTitle(title);
+            upload(book);
     }
+
+    public void upload(Book book){
+        if (book!=null){
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Book");
+            HashMap<String, String> hashMap = convertMashMap(book);
+            databaseReference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()){
+                        makeToast("The Data was upload", context);
+                        startActivity(new Intent(context, MainActivity.class));
+                    }else{
+                        makeToast("Wait for few minutes to upload", context);
+                    }
+                }
+            });
+
+        }
+    }
+    public HashMap convertMashMap(Book book){
+        HashMap<String, String> hashMap = new HashMap<>();
+        Book newBook = book;
+        hashMap.put("Title", newBook.getTitle());
+        hashMap.put("Content", newBook.getContent());
+//        hashMap.put("UID", newBook.getUid());
+
+        return hashMap;
+    }
+
+
 }

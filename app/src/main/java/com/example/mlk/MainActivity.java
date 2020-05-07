@@ -3,6 +3,7 @@ package com.example.mlk;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
@@ -25,6 +26,11 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.face.FirebaseVisionFace;
@@ -35,6 +41,8 @@ import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -43,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     ImageView add_newBook;
     Context context;
     RecyclerView recyclerView;
+    public static ArrayList<Book> books = new ArrayList<>();
+
 
 
 
@@ -51,11 +61,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initUI();
+        loadData();
     }
 
     public void initUI(){
         context = this;
+        recyclerView = findViewById(R.id.homePage_RecyclerView);
         setToolbar();
+    }
+
+    private void setRecyclerView(ArrayList<Book> books){
+        cus_book_list cus_book_list1 = new cus_book_list(context, books);
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        recyclerView.setAdapter(cus_book_list1);
     }
 
     private void setToolbar(){
@@ -71,6 +89,43 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(context, AddNewBook.class));
             }
         });
+    }
+
+    private void loadData(){
+        final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Book");
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // a method to catch the hashmap value
+                if (dataSnapshot.exists()) {
+                    Book book = new Book();
+                    books.clear();
+                    HashMap<String, Object> hashMap = (HashMap<String, Object>) dataSnapshot.getValue();
+                    for (String key : hashMap.keySet()){
+
+                       try{
+                            book.setContent((String) hashMap.get("Content"));
+                            book.setTitle((String) hashMap.get("Title"));
+
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    books.add(book);
+                    setRecyclerView(books);
+                }
+
+
+                }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
 
